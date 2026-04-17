@@ -412,7 +412,7 @@ $(function(){
   function displayTooltip(d, mouse, data) {
     var i
 
-    $tooltipTitle.text('cn: ' + (d.cn || d.title))
+    $tooltipTitle.text('name: ' + (d.cn || d.title))
 
     // Remove previous body
     $tooltipBody.children().not('.stub').remove()

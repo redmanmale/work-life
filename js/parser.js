@@ -105,8 +105,8 @@ $(function(){
 
   Parser.prototype.transformAdData = function(adItems) {
     var final_repo_info = {
-      name: 'AD data',
-      description: 'Objects: ' + adItems.length,
+      name: '',
+      description: 'Сотрудников: ' + adItems.length,
       labels: [],
       issues: [],
       earliest_issue_time: null

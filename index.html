@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bug Life - Interactive visualization of GitHub issues for a given repository</title>
+  <title> - жизнь замечательных людей</title>
 
   <link rel="stylesheet" href="css/bootstrap-with-docs.min.css">
   <link rel="stylesheet" href="css/style.css">
@@ -34,33 +34,6 @@
   </script>
 </head>
 <body>
-  <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
-    <div class="container">
-      <div class="navbar-header">
-        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a href="/bug-life" class="navbar-brand">Bug life</a>
-      </div>
-      <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
-        <ul class="nav navbar-nav">
-          <li>
-            <a href="#examples">Examples</a>
-          </li>
-          <li>
-            <a href="#about">About</a>
-          </li>
-          <li>
-            <a href="#explained">Showcase</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </header>
-
   <div class="bs-docs-header" id="content">
     <div class="container">
       <h1 id="repo-title">Loading...</h1>
@@ -84,22 +57,6 @@
           </div>
         </form>
         <div class="alert alert-warning" role="alert" id="repository-alert" style="display: none;"></div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-md-12">
-        <form class="form-horizontal" role="form" id="token-form" style="display: none">
-          <div class="height-placeholder"></div>
-          <div class="input-group">
-            <span class="input-group-btn">
-              <button class="btn btn-default" type="submit" id="token-button" data-loading-text="Loading...">Update token</button>
-            </span>
-            <input type="text" class="form-control" id="token-input" placeholder="your token here" value="">
-          </div>
-          <p class="help-block">Tokens are used to increase <a href="https://developer.github.com/v3/#rate-limiting" target="_blank">API rate limit</a>. Tokens can be <a href="https://help.github.com/articles/creating-an-access-token-for-command-line-use" target="_blank">manually generated</a>. If you want to view data for private repositories then you have to generate a token that has access to your private repositories.</p>
-          <p class="help-block">Tokens are stored in cookies. If you want to remove a token from cookies - set it as an empty string.</p>
-        </form>
       </div>
     </div>
 
@@ -139,85 +96,8 @@
     </div>
   </div>
 
-  <div class="container bs-docs-container">
-    <div class="row">
-      <div class="col-md-12">
-        <h2 id="nav" class="page-header">Examples</h2>
-        <p>Click on a link to load selected example:</p>
-        <div class="examples">
-          <ul>
-            <li><a href="#repository-form" data-github="ruipgil/scraperjs">ruipgil/scraperjs</a> - small and readable graph with right-side activity</li>
-            <li><a href="#repository-form" data-github="deanmalmgren/textract">deanmalmgren/textract</a> - active usage of labels from beginning of project</li>
-            <li><a href="#repository-form" data-github="NYTimes/backbone.stickit">NYTimes/backbone.stickit</a> - labeling abandoning</li>
-            <li><a href="#repository-form" data-github="HubSpot/pace">HubSpot/pace</a> - not a single label and growing piles of issues</li>
-            <li><a href="#repository-form" data-github="cuckoobox/cuckoo">cuckoobox/cuckoo</a> - with a gap in development</li>
-            <li><a href="#repository-form" data-github="uranusjr/macdown">uranusjr/macdown</a> - in continuous enhancement</li>
-            <li><a href="#repository-form" data-github="gogits/gogs">gogits/gogs</a> - rich in labels with both short and big lifespan issues</li>
-            <li><a href="#repository-form" data-github="jashkenas/backbone">jashkenas/backbone</a> - huge mountains of data</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="container bs-docs-container" id="about">
-    <div class="row">
-      <div class="col-md-12">
-        <h2 id="nav" class="page-header">About</h2>
-        <h4>General</h4>
-        <p>The following project was created for <a href="https://github.com/blog/1864-third-annual-github-data-challenge">Third Annual Github Data Challenge</a> and targets repository issues.</p>
-        <p>Bug-life is a visualization of repository issues from 2 perspectives:</p>
-        <ul>
-          <li>Amount of issues labels during the lifespan of the repo</li>
-          <li>Lifespan of an issue (since creation until closing)</li>
-        </ul>
-        <p>The data is collected using <a href="https://developer.github.com/v3/">Github API</a> and it includes:</p>
-        <ul>
-          <li>generic information about a repo (name, description, date created)</li>
-          <li>labels used in issues</li>
-          <li>repository issues</li>
-          <li>repository issues events</li>
-        </ul>
-        <h4>How it works?</h4>
-        <p>The top graph shows the number of labels of open issues at a specific date. It also presents the usage of issues and labels during the lifetime of the repo. Only current issue labels are shown, i.e. the unlabeled/labeled events are not tracked. Each label represents one unit, hence it gives an overview of the generic status of the project. For example, if there are many open issues with <code>enhancement</code> or <code>feature</code> labels, then most probably the team is working on a new version. If there are many <code>bug</code> and <code>documentation</code> labels, then the team is getting ready for a new release. It might be seen that some projects have no issues at all or are not using labels.</p>
-        <p>The bottom graph shows the lifespan of issues. The bigger the semicircle radius, the longer it takes to close an issue. If the end point of the semicircle is not visible on the graph, then the issue is still open. Each open/close event is visible on the graph. The color of the issue is set by the issue label. This is a good representation to determine old pending issues and view project agility.</p>
-        <h4>Why authorize?</h4>
-        <p>For unauthenticated requests, Github sets a requests rate limit up to <a href="https://developer.github.com/v3/#rate-limiting">60 requests per hour</a>. In case the number of requests to collect data is bigger than the rate limit you'll have to authenticate yourself via Github OAuth and authorize our application. After authorization your requests rate limit will be 5,000 requests per hour. Enjoy :)</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="container bs-docs-container" id="explained">
-    <div class="row">
-      <div class="col-md-12">
-        <h2 id="nav" class="page-header">Showcase</h2>
-        <h3>Cute fresh repo</h3>
-        <div class="explained-image">
-          <img src="screenshots/showcase-1.png" alt="deanmalmgren/textract graph">
-        </div>
-        <p>From the top graph it is seen that the repo contains mostly labeled issues, thus the maintainers keep track of different types of issues. There are few bugs and mostly feature requests. From the below graph - about half of issues have short lifespan. Feature requests require more time to be implemented and closed. As well, feature requests make out the main part of open issues at the moment.</p>
-        <div class="examples">
-          <a href="#repository-form" data-github="deanmalmgren/textract" class="btn btn-default">Load cute repo</a>
-        </div>
-        <h3>Mighty-mighty mountains</h3>
-        <div class="explained-image">
-          <img src="screenshots/showcase-2.png" alt="jashkenas/backbone graph">
-        </div>
-        <p>This is a popular repo on github - <a href="https://github.com/jashkenas/backbone" target="_blank">backbone</a>. It has a rich history, well organized labels and release cycles. On version 0.9.0, when backbone reached a relatively stable state, many issues were closed. Before this release there were other important ones, for example 0.5.0.</p>
-        <p>After 0.9.0 backbone lived through 3 other important milestones: 0.9.9, 1.0.0 and 1.1.0. Each of these releases was focused on different aspects. Right before version 0.9.9 most open issues were of type <code>change</code>, while before version 1.1.0 most open issues were of type <code>bug</code>.</p>
-        <div class="examples">
-          <a href="#repository-form" data-github="jashkenas/backbone" class="btn btn-default">Load mighty mountains</a>
-        </div>
-        <h3>Your own example</h3>
-        <p>Do you want your own example here? Create a <a target="_blank" href="https://github.com/9-volt/bug-life">pull request</a>.</p>
-      </div>
-    </div>
-  </div>
-
   <footer class="bs-docs-footer" role="contentinfo">
     <div class="container">
-      <p>Built by <a href="http://bumbu.ru" target="_blank">bumbu</a> and <a href="https://github.com/ana-balica" target="_blank">ana</a>.</p>
-      <p>Licensed under <a href="https://github.com/9-volt/bug-life/blob/gh-pages/LICENSE" target="_blank">MIT</a>. Available on <a href="https://github.com/9-volt/bug-life">9-volt/bug-life</a></p>
       <p>The authors do not hold any responsibility for displayed data.</p>
     </div>
   </footer>
