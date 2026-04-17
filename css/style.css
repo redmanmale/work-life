@@ -65,6 +65,16 @@ svg .nv-axis .tick line{
     linear-gradient(120deg, #0b2e8a 0%, #1646c3 45%, #0e369e 100%) !important;
 }
 
+.bs-docs-footer {
+  margin-top: 10px;
+  padding-top: 4px;
+  padding-bottom: 2px;
+}
+
+.bs-docs-footer p {
+  margin-bottom: 0;
+}
+
 @media (min-width: 768px) {
   .bs-docs-header {
     padding-top: 28px;
