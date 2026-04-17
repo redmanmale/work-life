@@ -179,6 +179,17 @@ svg .nv-axis .tick line{
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAANCAYAAAB2HjRBAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyNpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChNYWNpbnRvc2gpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOkZGRjcyNDBDMjcxQjExRTRCQUU5QkUwQUM5MzQ1QTVEIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOkZGRjcyNDBEMjcxQjExRTRCQUU5QkUwQUM5MzQ1QTVEIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6QzE2MjQyN0YyNzFCMTFFNEJBRTlCRTBBQzkzNDVBNUQiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6QzE2MjQyODAyNzFCMTFFNEJBRTlCRTBBQzkzNDVBNUQiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4v0UPHAAAB8UlEQVR42nySPYgaURDHJ+sHp6KieNeksBHtLPwgjYqi4RJEPI4EQRDstFTUIoWdYHkaCTYH4lUHR4pAikuwMCriioKtniEWIvgBeoVBVNy8WU7JmSUPduftm/9vdmbeAMMw8L9nt9uB0+lkYrEYc+zjA8eKRqNvpVLpB4qizET0uFgsQCQS3R7rnsGBQEAjl8sfGo3G38cn+JrNZlfHMLXfxOPxy9Fo9NBut//JRKVSQT6fh2QyeReJRM6fwXhA0/RnmUwGXq+XdZA0D7DZbGbtcrl81+l07on+NQvbbLbTbrd7z+PxIJPJANYXDochnU4fYNK0T2jFYvErtL1e7ztylMPh+DqdTsHn84FarQa73Q7z+RwsFgu43e592jdoU6kUEOjHZDIB5Hgk6heFQpFoNptgNBrBZDJBoVCA9XoNtVoNJBIJZnSNcC6Xg1KplMLyBoOBkapUKlOtVvtGKBRi7TAcDlkYv/v9Puj1+kcEW60WkL7Qm80GUE+CjNmGkcjfDAbDhUAggGAwyMJKpZJNebvdfqxWq5DNZunxeIzNe4969L3ASdkvj8fzUqfTDcvlMvD5fASxSWdWqzWxWq0S5K51xWKxdwC4RjIUCplcLhfj9/uZp+BiLh3FNZ71ev0nXplGo/n19IPfXLo/AgwANRcNej8aPh0AAAAASUVORK5CYII=)
 }
 
+/* Glyphicons font is not shipped; eye icons use embedded PNGs — same for clock */
+.glyphicon-time:before {
+  content: '';
+  display: inline-block;
+  width: 15px;
+  height: 13px;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='13' viewBox='0 0 15 13'%3E%3Ccircle cx='7.5' cy='6.5' r='5.2' fill='none' stroke='%23555' stroke-width='1.25'/%3E%3Cpath d='M7.5 3.8V6.5L9.8 8.2' fill='none' stroke='%23555' stroke-width='1.25' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
 .nvtooltip table td.legend-color-guide div.glyphicon{
   display: inline-block;
   margin: 2px 0 0 -3px;

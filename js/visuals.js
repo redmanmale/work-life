@@ -425,6 +425,112 @@ $(function(){
     return ('0' + (date.getMonth() + 1)).slice(-2) + '/' + ('0' + date.getDate()).slice(-2) + '/' +  date.getFullYear()
   }
 
+  /**
+   * Russian plural: 1 год, 2 года, 5 лет
+   */
+  function ruPlural(n, one, few, many) {
+    var n10 = n % 10
+    var n100 = n % 100
+    if (n10 === 1 && n100 !== 11) return one
+    if (n10 >= 2 && n10 <= 4 && (n100 < 10 || n100 > 20)) return few
+    return many
+  }
+
+  /**
+   * Inclusive calendar tenure as Y/M/D (same span as dateToDays(to)-dateToDays(from)+1).
+   */
+  function tenureYmdInclusive(fromStr, toStr) {
+    var p = fromStr.match(/\d+/g)
+    var fy = +p[0]
+    var fm = +p[1]
+    var fd = +p[2]
+    var toExclusiveTs = dateToTimestamp(toStr) + 86400000
+    var end = new Date(toExclusiveTs)
+    var ty = end.getUTCFullYear()
+    var tm = end.getUTCMonth() + 1
+    var td = end.getUTCDate()
+    var years = ty - fy
+    var months = tm - fm
+    var days = td - fd
+    if (days < 0) {
+      months -= 1
+      days += new Date(Date.UTC(ty, tm - 1, 0)).getUTCDate()
+    }
+    if (months < 0) {
+      years -= 1
+      months += 12
+    }
+    return { years: years, months: months, days: days }
+  }
+
+  function formatTenureYmd(ymd) {
+    var parts = []
+    if (ymd.years > 0) {
+      parts.push(
+        ymd.years +
+          ' ' +
+          ruPlural(ymd.years, 'год', 'года', 'лет')
+      )
+    }
+    if (ymd.months > 0) {
+      parts.push(
+        ymd.months +
+          ' ' +
+          ruPlural(ymd.months, 'месяц', 'месяца', 'месяцев')
+      )
+    }
+    if (ymd.days > 0) {
+      parts.push(
+        ymd.days + ' ' + ruPlural(ymd.days, 'день', 'дня', 'дней')
+      )
+    }
+    if (parts.length === 0) {
+      return 'и дня не отработал'
+    }
+    return parts.join(' ')
+  }
+
+  function formatInclusiveRangeTenure(fromStr, toStr) {
+    return formatTenureYmd(tenureYmdInclusive(fromStr, toStr))
+  }
+
+  /** Inclusive day count from hire to last day (or «today» if toStr is null). */
+  function inclusiveUtcDaySpan(fromStr, toStr) {
+    var endMs = toStr != null ? dateToTimestamp(toStr) : dateToTimestamp(null)
+    return Math.floor((endMs - dateToTimestamp(fromStr)) / 86400000) + 1
+  }
+
+  /**
+   * Длительность по числу дней (как в «Средний стаж»): грубое Y/M от суток.
+   */
+  function formatDurationDays(days) {
+    days = Math.max(0, Math.floor(days))
+    if (days < 365) {
+      return days + ' ' + ruPlural(days, 'день', 'дня', 'дней')
+    }
+
+    var years = Math.floor(days / 365)
+    var months = Math.floor((days % 365) / 30)
+    var parts = [years + ' ' + ruPlural(years, 'год', 'года', 'лет')]
+    if (months > 0) {
+      parts.push(
+        months + ' ' + ruPlural(months, 'месяц', 'месяца', 'месяцев')
+      )
+    }
+    return parts.join(' ')
+  }
+
+  function ymdFromUtcMs(ms) {
+    var d = new Date(ms)
+    return (
+      d.getUTCFullYear() +
+      '-' +
+      ('0' + (d.getUTCMonth() + 1)).slice(-2) +
+      '-' +
+      ('0' + d.getUTCDate()).slice(-2)
+    )
+  }
+
   function displayTooltip(d, mouse, data) {
     var i
 
@@ -455,7 +561,7 @@ $(function(){
           .addClass('glyphicon glyphicon-eye-open')
         .end()
           .find('.key')
-          .text('присоединился: ' + formatTimestamp(dateToTimestamp(d._open[i].from)))
+          .text('принят: ' + formatTimestamp(dateToTimestamp(d._open[i].from)))
         .end()
         .appendTo($tooltipBody)
         .show()
@@ -469,6 +575,41 @@ $(function(){
           .end()
             .find('.key')
             .text('уволен: ' + formatTimestamp(dateToTimestamp(d._open[i].to)))
+          .end()
+          .appendTo($tooltipBody)
+          .show()
+
+        $tooltipStub
+          .clone()
+          .removeClass('stub')
+            .find('.legend-color-guide > div')
+            .addClass('glyphicon glyphicon-time')
+          .end()
+            .find('.key')
+            .text(
+              'проработал: ' +
+                formatInclusiveRangeTenure(
+                  d._open[i].from,
+                  d._open[i].to
+                )
+            )
+          .end()
+          .appendTo($tooltipBody)
+          .show()
+      } else {
+        $tooltipStub
+          .clone()
+          .removeClass('stub')
+            .find('.legend-color-guide > div')
+            .addClass('glyphicon glyphicon-time')
+          .end()
+            .find('.key')
+            .text(
+              'работает уже: ' + formatInclusiveRangeTenure(
+                d._open[i].from,
+                null
+              )
+            )
           .end()
           .appendTo($tooltipBody)
           .show()
@@ -523,35 +664,6 @@ $(function(){
     return (value * 100).toFixed(1) + '%'
   }
 
-  function pluralizeYears(number) {
-    var n = Math.abs(number) % 100
-    var n1 = n % 10
-    if (n > 10 && n < 20) {
-      return 'лет'
-    }
-    if (n1 > 1 && n1 < 5) {
-      return 'года'
-    }
-    if (n1 === 1) {
-      return 'год'
-    }
-    return 'лет'
-  }
-
-  function formatDurationDays(days) {
-    if (days < 365) {
-      return days + ' дн.'
-    }
-
-    var years = Math.floor(days / 365)
-    var months = Math.floor((days % 365) / 30)
-    if (months > 0) {
-      return years + ' ' + pluralizeYears(years) + ' ' + months + ' мес.'
-    }
-
-    return years + ' ' + pluralizeYears(years)
-  }
-
   function createStatCardsHTML(items) {
     var html = ''
     for (var i = 0; i < items.length; i++) {
@@ -585,15 +697,26 @@ $(function(){
       var isActive = issue.active === true
       var finishDate = isActive ? now : toDateOrNow(issue.lastLogon || (issue.open && issue.open[issue.open.length - 1] ? issue.open[issue.open.length - 1].to : null))
       var tenureDays = daysBetween(hireDate, finishDate)
+      var hireYmd = ymdFromUtcMs(hireDate.getTime())
+      var finishYmd = ymdFromUtcMs(finishDate.getTime())
+      var tenurePretty = formatInclusiveRangeTenure(hireYmd, finishYmd)
 
       totalTenureDays += tenureDays
 
       if (tenureDays > 0 && (shortest == null || tenureDays < shortest.days)) {
-        shortest = {name: issue.cn || issue.title || '—', days: tenureDays}
+        shortest = {
+          name: issue.cn || issue.title || '—',
+          days: tenureDays,
+          tenurePretty: tenurePretty
+        }
       }
 
       if (longest == null || tenureDays > longest.days) {
-        longest = {name: issue.cn || issue.title || '—', days: tenureDays}
+        longest = {
+          name: issue.cn || issue.title || '—',
+          days: tenureDays,
+          tenurePretty: tenurePretty
+        }
       }
 
       if (isActive) {
@@ -618,14 +741,6 @@ $(function(){
     }
 
     var averageTenureDays = totalEmployees > 0 ? Math.round(totalTenureDays / totalEmployees) : 0
-    var topDepartment = '—'
-    var topDepartmentCount = 0
-    for (var dep in departmentActive) {
-      if (departmentActive[dep] > topDepartmentCount) {
-        topDepartment = dep
-        topDepartmentCount = departmentActive[dep]
-      }
-    }
 
     var stats = [
       { label: 'Всего сотрудников', value: String(totalEmployees) },
@@ -633,10 +748,10 @@ $(function(){
       { label: 'Уволенных', value: String(firedEmployees) },
       { label: 'Работают более года', value: formatPercent(activeEmployees > 0 ? oneYearPlus / activeEmployees : 0) },
       { label: 'Работают более двух лет', value: formatPercent(activeEmployees > 0 ? twoYearsPlus / activeEmployees : 0) },
-      { label: 'Работают самого начала', value: formatPercent(activeEmployees > 0 ? sinceFoundation / activeEmployees : 0) },
-      { label: 'Вжух и всё', value: shortest ? (shortest.name + ' (' + formatDurationDays(shortest.days) + ')') : '—' },
+      { label: 'Работают с самого начала', value: formatPercent(activeEmployees > 0 ? sinceFoundation / activeEmployees : 0) },
+      { label: 'Вжух и всё', value: shortest ? (shortest.name + ' (' + shortest.tenurePretty + ')') : '—' },
       { label: 'Средний стаж', value: formatDurationDays(averageTenureDays) },
-      { label: 'Дольше всех с нами', value: longest ? (longest.name + ' (' + formatDurationDays(longest.days) + ')') : '—' }
+      { label: 'Часть команды — часть корабля', value: longest ? (longest.name + ' (' + longest.tenurePretty + ')') : '—' }
     ]
 
     $('#employeesStatsGrid').html(createStatCardsHTML(stats))
