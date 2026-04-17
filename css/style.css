@@ -185,3 +185,40 @@ svg .nv-axis .tick line{
   vertical-align: middle;
   vertical-align: initial;
 }
+
+.employees-stats {
+  margin-top: 24px;
+  margin-bottom: 8px;
+  padding: 16px;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  background: #fcfcfc;
+}
+
+.employees-stats h3 {
+  margin-top: 0;
+  margin-bottom: 14px;
+}
+
+.employees-stats .stat-card {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px solid #ededed;
+  border-radius: 4px;
+  background: #fff;
+  min-height: 88px;
+}
+
+.employees-stats .stat-label {
+  margin: 0 0 6px;
+  color: #6b6b6b;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.employees-stats .stat-value {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.2;
+}

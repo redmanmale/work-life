@@ -72,6 +72,7 @@ $(function(){
 
     this.showStackedArea(data, onRendered)
     this.showSemiCircles(data, splitIssues)
+    this.showEmployeesStats(data)
 
     this.lastData = data
     this.lastSplitIssues = splitIssues
@@ -499,6 +500,148 @@ $(function(){
 
   function hideTooltip(d, mouse) {
     $tooltip.hide()
+  }
+
+  function toDateOrNow(dateString) {
+    if (dateString == null) {
+      return new Date()
+    }
+
+    var date = new Date(dateString)
+    if (isNaN(date.getTime())) {
+      return new Date()
+    }
+
+    return date
+  }
+
+  function daysBetween(start, end) {
+    return Math.max(0, Math.round((end.getTime() - start.getTime()) / 86400000))
+  }
+
+  function formatPercent(value) {
+    return (value * 100).toFixed(1) + '%'
+  }
+
+  function pluralizeYears(number) {
+    var n = Math.abs(number) % 100
+    var n1 = n % 10
+    if (n > 10 && n < 20) {
+      return 'лет'
+    }
+    if (n1 > 1 && n1 < 5) {
+      return 'года'
+    }
+    if (n1 === 1) {
+      return 'год'
+    }
+    return 'лет'
+  }
+
+  function formatDurationDays(days) {
+    if (days < 365) {
+      return days + ' дн.'
+    }
+
+    var years = Math.floor(days / 365)
+    var months = Math.floor((days % 365) / 30)
+    if (months > 0) {
+      return years + ' ' + pluralizeYears(years) + ' ' + months + ' мес.'
+    }
+
+    return years + ' ' + pluralizeYears(years)
+  }
+
+  function createStatCardsHTML(items) {
+    var html = ''
+    for (var i = 0; i < items.length; i++) {
+      html += '<div class="col-sm-6 col-md-4"><div class="stat-card">'
+      html += '<p class="stat-label">' + _.escape(items[i].label) + '</p>'
+      html += '<p class="stat-value">' + _.escape(items[i].value) + '</p>'
+      html += '</div></div>'
+    }
+    return html
+  }
+
+  Visuals.prototype.showEmployeesStats = function(data) {
+    var issues = data.issues || []
+    var totalEmployees = issues.length
+    var activeEmployees = 0
+    var firedEmployees = 0
+    var oneYearPlus = 0
+    var twoYearsPlus = 0
+    var sinceFoundation = 0
+    var shortest = null
+    var longest = null
+    var totalTenureDays = 0
+    var departmentActive = {}
+    var earliestHireDate = toDateOrNow(data.earliest_issue_time)
+    var now = new Date()
+    var firstMonthFromFoundationEnds = new Date(earliestHireDate.getTime() + 3 * 30 * 86400000)
+
+    for (var i = 0; i < issues.length; i++) {
+      var issue = issues[i]
+      var hireDate = toDateOrNow(issue.whenCreated || (issue.open && issue.open[0] ? issue.open[0].from : null))
+      var isActive = issue.active === true
+      var finishDate = isActive ? now : toDateOrNow(issue.lastLogon || (issue.open && issue.open[issue.open.length - 1] ? issue.open[issue.open.length - 1].to : null))
+      var tenureDays = daysBetween(hireDate, finishDate)
+
+      totalTenureDays += tenureDays
+
+      if (tenureDays > 0 && (shortest == null || tenureDays < shortest.days)) {
+        shortest = {name: issue.cn || issue.title || '—', days: tenureDays}
+      }
+
+      if (longest == null || tenureDays > longest.days) {
+        longest = {name: issue.cn || issue.title || '—', days: tenureDays}
+      }
+
+      if (isActive) {
+        activeEmployees += 1
+        if (tenureDays >= 365) {
+          oneYearPlus += 1
+        }
+        if (tenureDays >= 730) {
+          twoYearsPlus += 1
+        }
+        if (hireDate.getTime() <= firstMonthFromFoundationEnds.getTime()) {
+          sinceFoundation += 1
+        }
+
+        var departmentName = issue.department || 'без отдела'
+        if (departmentName !== 'без отдела') {
+          departmentActive[departmentName] = (departmentActive[departmentName] || 0) + 1
+        }
+      } else {
+        firedEmployees += 1
+      }
+    }
+
+    var averageTenureDays = totalEmployees > 0 ? Math.round(totalTenureDays / totalEmployees) : 0
+    var turnoverShare = totalEmployees > 0 ? firedEmployees / totalEmployees : 0
+    var topDepartment = '—'
+    var topDepartmentCount = 0
+    for (var dep in departmentActive) {
+      if (departmentActive[dep] > topDepartmentCount) {
+        topDepartment = dep
+        topDepartmentCount = departmentActive[dep]
+      }
+    }
+
+    var stats = [
+      { label: 'Всего сотрудников', value: String(totalEmployees) },
+      { label: 'Активных', value: String(activeEmployees) },
+      { label: 'Уволенных', value: String(firedEmployees) },
+      { label: 'Работают более года', value: formatPercent(activeEmployees > 0 ? oneYearPlus / activeEmployees : 0) },
+      { label: 'Работают более двух лет', value: formatPercent(activeEmployees > 0 ? twoYearsPlus / activeEmployees : 0) },
+      { label: 'Работают самого начала', value: formatPercent(activeEmployees > 0 ? sinceFoundation / activeEmployees : 0) },
+      { label: 'Вжух и всё', value: shortest ? (shortest.name + ' (' + formatDurationDays(shortest.days) + ')') : '—' },
+      { label: 'Средний стаж', value: formatDurationDays(averageTenureDays) },
+      { label: 'Дольше всех с нами', value: longest ? (longest.name + ' (' + formatDurationDays(longest.days) + ')') : '—' },
+      { label: 'Текучесть кадров', value: formatPercent(turnoverShare) }
+    ]
+
+    $('#employeesStatsGrid').html(createStatCardsHTML(stats))
   }
 
   window.Visuals = Visuals
