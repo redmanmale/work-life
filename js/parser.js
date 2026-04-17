@@ -92,9 +92,12 @@ $(function(){
     this.resetAttributes()
     this.beforeParse()
 
-    $.getJSON('ad-data.json')
+    var filename = 'ad-data.json'
+    $.getJSON(filename)
       .done(function(adItems) {
-        var final_repo_info = that.transformAdData(adItems || [])
+        filename = (filename.substring(0, filename.lastIndexOf('.')) || filename).toUpperCase();
+        document.title = filename + ' - жизнь замечательных людей';
+        var final_repo_info = that.transformAdData(filename, adItems || [])
         that.onProgress(100)
         that.afterParse(final_repo_info)
       })
@@ -103,9 +106,9 @@ $(function(){
       })
   }
 
-  Parser.prototype.transformAdData = function(adItems) {
+  Parser.prototype.transformAdData = function(header, adItems) {
     var final_repo_info = {
-      name: '',
+      name: header,
       description: 'Сотрудников: ' + adItems.length,
       labels: [],
       issues: [],
