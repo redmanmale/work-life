@@ -9,8 +9,6 @@ $(function(){
     , parsingLocked = false
     , repositoryUri = 'local/ad-data'
     , $graphs = $('#graphs')
-    , $progress = $('#progress')
-    , $progressBar = $progress.children('.progress-bar')
     , $tokenForm = $('#token-form')
     , $tokenInput = $('#token-input')
     , $tokenButton = $('#token-button')
@@ -38,14 +36,6 @@ $(function(){
     $repositoryAlert.hide()
   }
 
-  function setProgress(progress) {
-    $progressBar
-      .attr('aria-valuenow', progress)
-      .width(progress + '%')
-      .text(progress + '%')
-  }
-
-
   /*
     Parser callbacks
   */
@@ -56,7 +46,6 @@ $(function(){
 
     $graphs.hide()
     visuals.emptyGraphs()
-    $progress.show()
   }
 
   parser.afterParse = function(data){
@@ -64,8 +53,6 @@ $(function(){
     $repoDescription.text(data.description || '')
     unlockInput()
 
-    $progress.hide()
-    setProgress(0)
     $graphs.show()
 
     visuals.showData(data)
@@ -77,15 +64,10 @@ $(function(){
     unlockInput()
     lastInputValue = null
 
-    $progress.hide()
-    setProgress(0)
-
     showAlert('<strong>Error occured!</strong> ' + message, 'danger')
   }
 
-  parser.onProgress = function(progress){
-    setProgress(progress)
-  }
+  parser.onProgress = function(){}
 
   /*
     Lock input while loading
