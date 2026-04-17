@@ -618,7 +618,6 @@ $(function(){
     }
 
     var averageTenureDays = totalEmployees > 0 ? Math.round(totalTenureDays / totalEmployees) : 0
-    var turnoverShare = totalEmployees > 0 ? firedEmployees / totalEmployees : 0
     var topDepartment = '—'
     var topDepartmentCount = 0
     for (var dep in departmentActive) {
@@ -637,8 +636,7 @@ $(function(){
       { label: 'Работают самого начала', value: formatPercent(activeEmployees > 0 ? sinceFoundation / activeEmployees : 0) },
       { label: 'Вжух и всё', value: shortest ? (shortest.name + ' (' + formatDurationDays(shortest.days) + ')') : '—' },
       { label: 'Средний стаж', value: formatDurationDays(averageTenureDays) },
-      { label: 'Дольше всех с нами', value: longest ? (longest.name + ' (' + formatDurationDays(longest.days) + ')') : '—' },
-      { label: 'Текучесть кадров', value: formatPercent(turnoverShare) }
+      { label: 'Дольше всех с нами', value: longest ? (longest.name + ' (' + formatDurationDays(longest.days) + ')') : '—' }
     ]
 
     $('#employeesStatsGrid').html(createStatCardsHTML(stats))
