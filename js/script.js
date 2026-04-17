@@ -109,18 +109,7 @@ $(function(){
   var lastInputValue = null
 
   function parseInput(str) {
-    var fullRegexp = /^https?\:\/\/github.com\/([a-z0-9\-\_\.]+\/[a-z0-9\-\_\.]+)\/?/i
-      , simpleRegexp = /([a-z0-9\-\_\.]+\/[a-z0-9\-\_\.]+)\/?/i
-      , match
-
-    // Check if full repo url was passed (http://github.com/user/name)
-    if ((match = fullRegexp.exec(str)) != null) {
-      return match[1]
-    } else if ((match = simpleRegexp.exec(str)) != null) {
-      return match[1]
-    } else {
-      return null
-    }
+    return 'local/ad-data'
   }
 
   function checkAndParse() {

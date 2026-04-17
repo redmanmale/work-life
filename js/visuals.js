@@ -412,7 +412,7 @@ $(function(){
   function displayTooltip(d, mouse, data) {
     var i
 
-    $tooltipTitle.text('Issue #' + d.number + ': ' + d.title)
+    $tooltipTitle.text('cn: ' + (d.cn || d.title))
 
     // Remove previous body
     $tooltipBody.children().not('.stub').remove()
@@ -425,7 +425,7 @@ $(function(){
           .css('background-color', '#' + getLabelColor(data, d.labels[i]))
         .end()
           .find('.key')
-          .text(d.labels[i])
+          .text('department: ' + d.labels[i])
         .end()
         .appendTo($tooltipBody)
         .show()
@@ -439,7 +439,7 @@ $(function(){
           .addClass('glyphicon glyphicon-eye-open')
         .end()
           .find('.key')
-          .text(formatTimestamp(dateToTimestamp(d._open[i].from)))
+          .text('whenCreated: ' + formatTimestamp(dateToTimestamp(d._open[i].from)))
         .end()
         .appendTo($tooltipBody)
         .show()
@@ -452,11 +452,25 @@ $(function(){
             .addClass('glyphicon glyphicon-eye-close')
           .end()
             .find('.key')
-            .text(formatTimestamp(dateToTimestamp(d._open[i].to)))
+            .text('lastLogon: ' + formatTimestamp(dateToTimestamp(d._open[i].to)))
           .end()
           .appendTo($tooltipBody)
           .show()
       }
+    }
+
+    if (d.lastLogon === null) {
+      $tooltipStub
+        .clone()
+        .removeClass('stub')
+          .find('.legend-color-guide > div')
+          .addClass('glyphicon glyphicon-eye-close')
+        .end()
+          .find('.key')
+          .text('lastLogon: null')
+        .end()
+        .appendTo($tooltipBody)
+        .show()
     }
 
     $tooltip.show()

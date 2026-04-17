@@ -91,24 +91,77 @@ $(function(){
 
     this.resetAttributes()
     this.beforeParse()
-    var github = this.auth()
-    var repository_uri_splitted = repository_uri.split("/")
-    var username = repository_uri_splitted[0]
-    var reponame = repository_uri_splitted[1]
 
-    var repo = github.getRepo(username, reponame);
-    var final_repo_info = {}
-    repo.show(function(err, repo) {
-      if (err !== null) {
-        return that.checkError(err, repository_uri)
+    $.getJSON('ad-data.json')
+      .done(function(adItems) {
+        var final_repo_info = that.transformAdData(adItems || [])
+        that.onProgress(100)
+        that.afterParse(final_repo_info)
+      })
+      .fail(function() {
+        that.onError('Failed to load data from ad-data.json')
+      })
+  }
+
+  Parser.prototype.transformAdData = function(adItems) {
+    var final_repo_info = {
+      name: 'AD data',
+      description: 'Objects: ' + adItems.length,
+      labels: [],
+      issues: [],
+      earliest_issue_time: null
+    }
+    var labelsMap = {}
+    var earliestTimestamp = +Infinity
+
+    for (var i = 0; i < adItems.length; i++) {
+      var item = adItems[i]
+      var created = normalizeIsoDate(item.whenCreated) || formatDate(new Date())
+      var lastLogon = item.lastLogon == null ? null : normalizeIsoDate(item.lastLogon)
+      var department = item.department
+      var issueLabels = []
+
+      if (department) {
+        issueLabels.push(department)
+        if (!labelsMap.hasOwnProperty(department)) {
+          labelsMap[department] = {
+            name: department,
+            color: stringToColor(department)
+          }
+        }
       }
-      final_repo_info.name = repo.name
-      final_repo_info.description = repo.description
-      final_repo_info.created_at = formatDate(new Date(repo.created_at))
-      final_repo_info.url = repo.url
 
-      that.fillIssuesData(final_repo_info, github, repository_uri)
-    })
+      final_repo_info.issues.push({
+        url: '',
+        title: item.cn || '(no cn)',
+        cn: item.cn || '(no cn)',
+        department: department,
+        whenCreated: created,
+        lastLogon: lastLogon,
+        state: lastLogon === null ? 'open' : 'closed',
+        open: [{from: created, to: lastLogon}],
+        labels: issueLabels,
+        number: i + 1
+      })
+
+      if (created != null) {
+        var createdTs = Date.parse(created)
+        if (!isNaN(createdTs) && createdTs < earliestTimestamp) {
+          earliestTimestamp = createdTs
+          final_repo_info.earliest_issue_time = created
+        }
+      }
+    }
+
+    for (var key in labelsMap) {
+      final_repo_info.labels.push(labelsMap[key])
+    }
+
+    if (final_repo_info.earliest_issue_time == null) {
+      final_repo_info.earliest_issue_time = formatDate(new Date())
+    }
+
+    return final_repo_info
   }
 
   /**
@@ -385,6 +438,35 @@ $(function(){
     var month = date_obj.getMonth() + 1
     var year = date_obj.getFullYear()
     return year + "-" + pad2(month) + "-" + pad2(date)
+  }
+
+  function normalizeIsoDate(isoString) {
+    if (!isoString) {
+      return null
+    }
+
+    var date = new Date(isoString)
+    if (isNaN(date.getTime())) {
+      return null
+    }
+
+    return formatDate(date)
+  }
+
+  function stringToColor(value) {
+    var hash = 0
+    for (var i = 0; i < value.length; i++) {
+      hash = value.charCodeAt(i) + ((hash << 5) - hash)
+      hash = hash & hash
+    }
+
+    var color = ''
+    for (var j = 0; j < 3; j++) {
+      var channel = (hash >> (j * 8)) & 255
+      color += ('00' + channel.toString(16)).slice(-2)
+    }
+
+    return color
   }
 
   /**
