@@ -66,18 +66,18 @@ $(function(){
     }
   }
 
-  Visuals.prototype.showData = function(data) {
+  Visuals.prototype.showData = function(data, onRendered) {
     console.log(data)
     var splitIssues = splitIssuesByOpenTime(data)
 
-    this.showStackedArea(data)
+    this.showStackedArea(data, onRendered)
     this.showSemiCircles(data, splitIssues)
 
     this.lastData = data
     this.lastSplitIssues = splitIssues
   }
 
-  Visuals.prototype.showStackedArea = function(data) {
+  Visuals.prototype.showStackedArea = function(data, onRendered) {
     // Bootstrap stacked area object
     var processedData = bootstrapStackedAreaObject(data)
 
@@ -90,7 +90,7 @@ $(function(){
       processedDataArray.push(processedData[p])
     }
 
-    drawStackedArea(processedDataArray)
+    drawStackedArea(processedDataArray, onRendered)
   }
 
   function bootstrapStackedAreaObject(data) {
@@ -183,8 +183,9 @@ $(function(){
     }
   }
 
-  function drawStackedArea(processedDataArray) {
+  function drawStackedArea(processedDataArray, onRendered) {
     var _chart // Keeps chart instance
+      , rendered = false
 
     nv.dev = false
     nv.addGraph(function() {
@@ -225,10 +226,24 @@ $(function(){
     });
 
     // After renderer finished
-    nv.dispatch.on('render_end', function(){
+    function completeRender() {
+      if (rendered) {
+        return
+      }
+
+      rendered = true
+
       // Remove onClick dispatch
       _chart.stacked.dispatch.on('areaClick.toggle', null)
-    })
+
+      if (typeof onRendered === 'function') {
+        onRendered()
+      }
+    }
+
+    nv.dispatch.on('render_end.visuals', completeRender)
+
+    setTimeout(completeRender, 400)
   }
 
   function dateToDays(str) {

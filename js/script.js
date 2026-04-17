@@ -8,7 +8,7 @@ $(function(){
     , $repositoryAlert = $('#repository-alert')
     , parsingLocked = false
     , repositoryUri = 'local/ad-data'
-    , $graphs = $('#graphs')
+    , $graphsStage = $('#graphs-stage')
     , $tokenForm = $('#token-form')
     , $tokenInput = $('#token-input')
     , $tokenButton = $('#token-button')
@@ -36,6 +36,14 @@ $(function(){
     $repositoryAlert.hide()
   }
 
+  function showGraphsLoader() {
+    $graphsStage.addClass('is-loading')
+  }
+
+  function hideGraphsLoader() {
+    $graphsStage.removeClass('is-loading')
+  }
+
   /*
     Parser callbacks
   */
@@ -44,7 +52,7 @@ $(function(){
     $repoDescription.text(loadingText)
     lockInput()
 
-    $graphs.hide()
+    showGraphsLoader()
     visuals.emptyGraphs()
   }
 
@@ -53,9 +61,9 @@ $(function(){
     $repoDescription.text(data.description || '')
     unlockInput()
 
-    $graphs.show()
-
-    visuals.showData(data)
+    visuals.showData(data, function() {
+      hideGraphsLoader()
+    })
   }
 
   parser.onError = function(message){
@@ -63,6 +71,7 @@ $(function(){
     $repoDescription.text(errorText)
     unlockInput()
     lastInputValue = null
+    hideGraphsLoader()
 
     showAlert('<strong>Error occured!</strong> ' + message, 'danger')
   }
