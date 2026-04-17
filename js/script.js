@@ -1,14 +1,13 @@
 $(function(){
   var parser = new Parser()
     , visuals = new Visuals('graph')
-    , $repositoryInput = $('#repository-input')
-    , $repositoryButton = $('#repository-button')
     , $repoTitle = $('#repo-title')
     , $repoDescription = $('#repo-description')
     , loadingText = 'Loading...'
     , errorText = 'Error'
     , $repositoryAlert = $('#repository-alert')
     , parsingLocked = false
+    , repositoryUri = 'local/ad-data'
     , $graphs = $('#graphs')
     , $progress = $('#progress')
     , $progressBar = $progress.children('.progress-bar')
@@ -93,121 +92,23 @@ $(function(){
   */
   function lockInput() {
     parsingLocked = true
-    $repositoryInput.attr('disabled', 'disabled')
-    $repositoryButton.button('loading')
   }
 
   function unlockInput() {
     parsingLocked = false
-    $repositoryInput.removeAttr('disabled')
-    $repositoryButton.button('reset')
   }
 
-  /*
-    On page processing
-  */
-  var lastInputValue = null
-
-  function parseInput(str) {
-    return 'local/ad-data'
-  }
-
-  function checkAndParse() {
+  function runParse() {
     // Do not check if script is still working
     if (parsingLocked) {
       return
     }
 
-    var val = parseInput($repositoryInput.val())
-
-    // Update input value with parsed value
-    if (val !== null && $repositoryInput.val() !== val) {
-      $repositoryInput.val(val)
-    }
-
-    if (val !== null && val !== lastInputValue) {
-      // Update browser history
-      window.history.pushState({}, "", document.location.href.replace(/\?.*/i, '').replace(/\/$/i, '') + '/?repo=' + val)
-
-      hideAlert()
-
-      // Cache last value
-      lastInputValue = val
-
-      // Run parser
-      parser.parse(val)
-
-      // Change button state
-      checkButtonState()
-    } else if (val === null) {
-      // Display warning
-      showAlert('<strong>Wrong format!</strong> Please insert repository slug as <code>user/name</code> or <code>https://github.com/user/name</code>', 'warning')
-    }
+    hideAlert()
+    parser.parse(repositoryUri)
   }
 
-  // On form submit
-  $('#repository-form').submit(function(ev){
-    ev.preventDefault()
-    checkAndParse()
-  })
-
-  // On clicking examples links
-  $('.examples').on('click', 'a', function(ev){
-    $repositoryInput.val($(this).data('github'))
-    checkAndParse()
-  })
-
-  function getQueryParams(qs) {
-    qs = qs.split("+").join(" ");
-
-    var params = {}
-      , tokens
-      , re = /[?&]?([^=]+)=([^&]*)/g
-      ;
-
-    while (tokens = re.exec(qs)) {
-      params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2]);
-    }
-
-    return params;
-  }
-
-  // If repo is passed trough URI then assign it to input
-  if (document.location.search && getQueryParams(document.location.search).hasOwnProperty('repo')) {
-    $repositoryInput.val(getQueryParams(document.location.search).repo)
-  }
-
-  window.onpopstate = function() {
-    if (getQueryParams(document.location.search).hasOwnProperty('repo')) {
-      $repositoryInput.val(getQueryParams(document.location.search).repo)
-      checkAndParse()
-    }
-  }
-
-  // If initial form has a value
-  if ($repositoryInput.val()) {
-    checkAndParse()
-  }
-
-  function checkButtonState(){
-    var val = parseInput($repositoryInput.val())
-
-    if (val !== null && val !== lastInputValue) {
-      $repositoryButton.addClass('btn-primary')
-    } else {
-      $repositoryButton.removeClass('btn-primary')
-    }
-  }
-
-  // On input content changes (but is not submitted)
-  $repositoryInput.on('change paste keyup', function(ev){
-    // Do not process when Enter is pressed
-    if (ev.type === 'keyup' && ev.keyCode === 13) {
-      return;
-    }
-
-    checkButtonState()
-  })
+  runParse()
 
   /*
     Authentication
@@ -233,8 +134,7 @@ $(function(){
       document.cookie = "token=" + github.access_token
 
       // Continue with parsing
-      lastInputValue = null
-      checkAndParse()
+      runParse()
     }, function(error) {
       console.log('Error, failed to auth: ', error)
     })
