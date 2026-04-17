@@ -117,7 +117,11 @@ $(function(){
     for (var i = 0; i < adItems.length; i++) {
       var item = adItems[i]
       var created = normalizeIsoDate(item.whenCreated) || formatDate(new Date())
-      var lastLogon = item.lastLogon == null ? null : normalizeIsoDate(item.lastLogon)
+      var isActive = item.active === true
+      var lastLogon = null
+      if (!isActive && item.lastLogon != null) {
+        lastLogon = normalizeIsoDate(item.lastLogon)
+      }
       var department = item.department
       var issueLabels = []
 
@@ -136,6 +140,7 @@ $(function(){
         title: item.cn || '(no cn)',
         cn: item.cn || '(no cn)',
         department: department,
+        active: isActive,
         whenCreated: created,
         lastLogon: lastLogon,
         state: lastLogon === null ? 'open' : 'closed',
