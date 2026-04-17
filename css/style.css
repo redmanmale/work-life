@@ -49,6 +49,20 @@ svg .nv-axis .tick line{
   padding-top: 20px;
   padding-bottom: 30px;
   margin-bottom: 20px;
+  background:
+    radial-gradient(90% 140% at 85% 15%, rgba(67, 118, 255, 0.45) 0%, rgba(67, 118, 255, 0) 55%),
+    linear-gradient(120deg, #0b2e8a 0%, #1646c3 45%, #0e369e 100%) !important;
+  color: #ffffff;
+}
+
+.bs-docs-header p {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+#content.bs-docs-header {
+  background:
+    radial-gradient(90% 140% at 85% 15%, rgba(67, 118, 255, 0.45) 0%, rgba(67, 118, 255, 0) 55%),
+    linear-gradient(120deg, #0b2e8a 0%, #1646c3 45%, #0e369e 100%) !important;
 }
 
 @media (min-width: 768px) {
