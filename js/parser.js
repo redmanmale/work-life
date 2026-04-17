@@ -43,14 +43,24 @@ $(function(){
 
     this.beforeParse()
 
-    var filename = 'ad-data.json'
-    $.getJSON(filename)
-      .done(function(adItems) {
-        filename = (filename.substring(0, filename.lastIndexOf('.')) || filename).toUpperCase();
-        document.title = filename + ' - жизнь замечательных людей';
-        var final_repo_info = that.transformAdData(filename, adItems || [])
-        that.onProgress(100)
-        that.afterParse(final_repo_info)
+    function fetchAndProcess(dataFile) {
+      $.getJSON(dataFile)
+        .done(function(adItems) {
+          var filename = (dataFile.substring(0, dataFile.lastIndexOf('.')) || dataFile).toUpperCase();
+          document.title = filename + ' - жизнь замечательных людей';
+          var final_repo_info = that.transformAdData(filename, adItems || [])
+          that.onProgress(100)
+          that.afterParse(final_repo_info)
+        })
+        .fail(function() {
+          that.onError('Failed to load data from ' + dataFile)
+        })
+    }
+
+    $.getJSON('config.json')
+      .done(function(cfg) {
+        var dataFile = cfg && cfg.dataFile
+        fetchAndProcess(dataFile)
       })
       .fail(function() {
         that.onError('Failed to load data')
