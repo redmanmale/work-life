@@ -16,7 +16,7 @@ $(function(){
    * Init visuals. One time call
    * @param  {String} selector
    */
-  Visuals.prototype.init = function(selector) {
+  Visuals.prototype.init = function() {
     var that = this
       , $svg1 = $('#stackedArea svg')
       , $svg2 = $('#semiCircles svg')
@@ -28,7 +28,7 @@ $(function(){
       // .style('margin-right', MARGIN_RIGHT + 'px')
 
     // On resize
-    var onResize = function(ev){
+    var onResize = function(){
       if (that.lastData != null) {
         that.showSemiCircles(that.lastData, that.lastSplitIssues, false)
       }
@@ -129,7 +129,6 @@ $(function(){
       , label
       , o
       , open
-      , d
       , from
       , to
 
@@ -325,10 +324,8 @@ $(function(){
 
   Visuals.prototype.showSemiCircles = function(data, splitIssues, createNew) {
     var container = d3.select('#semiCircles')
-      , $container = $('#semiCircles')
       , svg = container.select('svg')
       , width = svg[0][0].getBoundingClientRect().width
-      , height = svg[0][0].getBoundingClientRect().height
       , start = dateToDays(data.earliest_issue_time)
       , today = dateToDays(null)
       , scale = d3.scale.linear().domain([0, today - start]).range([MARGIN_LEFT, width + MARGIN_LEFT])
@@ -624,7 +621,6 @@ $(function(){
       , y = mouse[1]
       , xPadding = 50
       , width = svg.offsetWidth
-      , height = svg.offsetHeight
       , tooltipWidth = $tooltip.width()
       , tooltipHeight = $tooltip.height()
 
