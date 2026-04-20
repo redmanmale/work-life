@@ -228,7 +228,7 @@ $(function(){
 
       //Format x-axis labels with custom function.
       chart.xAxis.tickFormat(function(d) {
-        return d3.time.format('%x')(new Date(d))
+        return d3.time.format('%d/%m/%Y')(new Date(d))
       });
 
       chart.yAxis.tickFormat(d3.format(',.0f'));
@@ -431,13 +431,13 @@ $(function(){
     , $tooltipStub = $tooltip.find('.stub')
 
   /**
-   * Formats a timestamp to MM/DD/YYYY
+   * Formats a timestamp to DD/MM/YYYY
    * @param  {Integer} timestamp
    * @return {String}
    */
   function formatTimestamp(timestamp) {
     var date = new Date(timestamp)
-    return ('0' + (date.getMonth() + 1)).slice(-2) + '/' + ('0' + date.getDate()).slice(-2) + '/' +  date.getFullYear()
+    return ('0' + date.getDate()).slice(-2) + '/' + ('0' + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear()
   }
 
   /**
