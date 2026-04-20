@@ -208,6 +208,24 @@ $(function(){
         .showLegend(false)                // Hide legend
         .transitionDuration(0)
 
+      var defaultTooltipContentGenerator = chart.interactiveLayer.tooltip.contentGenerator()
+      chart.interactiveLayer.tooltip.contentGenerator(function(d) {
+        if (!d || !d.series || !d.series.length) {
+          return defaultTooltipContentGenerator(d)
+        }
+
+        var filteredSeries = d.series.filter(function(seriesItem) {
+          return Number(seriesItem.value) !== 0
+        })
+
+        var tooltipData = {
+          value: d.value,
+          series: filteredSeries
+        }
+
+        return defaultTooltipContentGenerator(tooltipData)
+      })
+
       //Format x-axis labels with custom function.
       chart.xAxis.tickFormat(function(d) {
         return d3.time.format('%x')(new Date(d))
