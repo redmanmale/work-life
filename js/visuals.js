@@ -320,6 +320,7 @@ $(function(){
           , _open: _open
           , state: issue.state
           , title: issue.title
+          , isServiceAccount: issue.isServiceAccount
           , url: issue.url
           , _linked: _linked
           })
@@ -562,7 +563,7 @@ $(function(){
           .css('background-color', '#' + getLabelColor(data, d.labels[i]))
         .end()
           .find('.key')
-          .text('отдел: ' + d.labels[i])
+          .text((d.isServiceAccount ? 'группа: ' : 'отдел: ') + d.labels[i])
         .end()
         .appendTo($tooltipBody)
         .show()
@@ -576,7 +577,7 @@ $(function(){
           .addClass('glyphicon glyphicon-eye-open')
         .end()
           .find('.key')
-          .text('принят: ' + formatTimestamp(dateToTimestamp(d._open[i].from)))
+          .text((d.isServiceAccount ? 'создана: ' : 'принят: ') + formatTimestamp(dateToTimestamp(d._open[i].from)))
         .end()
         .appendTo($tooltipBody)
         .show()
@@ -589,7 +590,7 @@ $(function(){
             .addClass('glyphicon glyphicon-eye-close')
           .end()
             .find('.key')
-            .text('уволен: ' + formatTimestamp(dateToTimestamp(d._open[i].to)))
+            .text((d.isServiceAccount ? 'последний вход: ' : 'уволен: ') + formatTimestamp(dateToTimestamp(d._open[i].to)))
           .end()
           .appendTo($tooltipBody)
           .show()
@@ -602,7 +603,7 @@ $(function(){
           .end()
             .find('.key')
             .text(
-              'проработал: ' +
+              (d.isServiceAccount ? 'использовалась: ' : 'проработал: ') +
                 formatInclusiveRangeTenure(
                   d._open[i].from,
                   d._open[i].to
@@ -620,7 +621,7 @@ $(function(){
           .end()
             .find('.key')
             .text(
-              'работает уже: ' + formatInclusiveRangeTenure(
+              (d.isServiceAccount ? 'существует: ' : 'работает уже: ') + formatInclusiveRangeTenure(
                 d._open[i].from,
                 null
               )
@@ -690,7 +691,7 @@ $(function(){
   }
 
   Visuals.prototype.showEmployeesStats = function(data) {
-    var issues = data.issues || []
+    var issues = (data.issues || []).filter(function(issue) { return !issue.isServiceAccount })
     var totalEmployees = issues.length
     var activeEmployees = 0
     var firedEmployees = 0
@@ -701,7 +702,10 @@ $(function(){
     var longest = null
     var totalTenureDays = 0
     var departmentActive = {}
-    var earliestHireDate = toDateOrNow(data.earliest_issue_time)
+    var earliestHireDate = issues.reduce(function(earliest, issue) {
+      var date = toDateOrNow(issue.whenCreated)
+      return date < earliest ? date : earliest
+    }, new Date())
     var now = new Date()
     var firstMonthFromFoundationEnds = new Date(earliestHireDate.getTime() + 3 * 30 * 86400000)
 

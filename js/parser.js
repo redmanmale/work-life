@@ -70,13 +70,14 @@ $(function(){
   Parser.prototype.transformAdData = function(header, adItems) {
     var final_repo_info = {
       name: header,
-      description: 'Сотрудников: ' + adItems.length,
+      description: '',
       labels: [],
       issues: [],
       earliest_issue_time: null
     }
     var labelsMap = {}
     var earliestTimestamp = +Infinity
+    var employeeCount = 0
 
     for (var i = 0; i < adItems.length; i++) {
       var item = adItems[i]
@@ -87,7 +88,20 @@ $(function(){
         lastLogon = normalizeIsoDate(item.lastLogon)
       }
       var department = item.department
+      var isServiceAccount = (!department || !department.trim()) &&
+        typeof item.cn === 'string' && item.cn.trim() !== '' && !/\s/.test(item.cn.trim())
       var issueLabels = []
+
+      if (isServiceAccount) {
+        department = null
+        issueLabels.push('Технические сервисные учётки')
+        labelsMap['Технические сервисные учётки'] = {
+          name: 'Технические сервисные учётки',
+          color: stringToColor('Технические сервисные учётки')
+        }
+      } else {
+        employeeCount++
+      }
 
       if (department) {
         issueLabels.push(department)
@@ -104,6 +118,7 @@ $(function(){
         title: item.cn || '(no cn)',
         cn: item.cn || '(no cn)',
         department: department,
+        isServiceAccount: isServiceAccount,
         active: isActive,
         whenCreated: created,
         lastLogon: lastLogon,
@@ -121,6 +136,8 @@ $(function(){
         }
       }
     }
+
+    final_repo_info.description = 'Сотрудников: ' + employeeCount
 
     for (var key in labelsMap) {
       final_repo_info.labels.push(labelsMap[key])
